@@ -1,6 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import path from 'path'
+import Jimp from 'jimp';
 
 (async () => {
 
@@ -30,6 +32,24 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   /**************************************************************************** */
 
   //! END @TODO1
+  app.get( "/filteredimage", async ( req, res ) => {    
+    const url = req.query.image_url;
+
+    if (!url) {
+      return res.status(400).send(`url is required`);
+    }
+    const imageLoc = await filterImageFromURL(url);
+    // const image = path.basename(imageLoc);
+    res.sendFile(imageLoc, (err) => {
+      if (err) {
+       new Error('Error sending File!');
+      } else {
+        var array:string[] = [imageLoc];
+        deleteLocalFiles(array);
+      }
+     });
+
+  });
   
   // Root Endpoint
   // Displays a simple message to the user
